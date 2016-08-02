@@ -7,10 +7,14 @@ const urlencode  = require('urlencode');
 function byProperty(key) {
 
   return (a, b) => {
-    if (a[key] === b[key]) {
-      return 0;
+    if (a[key] > b[key]) {
+      return 1;
     }
-    return (a[key] < b[key]) ? -1 : 1;
+    if (a[key] < b[key]) {
+      return -1;
+    }
+
+    return 0;
   };
 }
 
@@ -23,7 +27,7 @@ function slugify(str) {
 
 function returnTrackColor(trackInfo, id) {
   if ((trackInfo == null) || (id == null)) {
-    return '#000000';
+    return '#000000'
   }
   return trackInfo[id];
 }
@@ -184,12 +188,20 @@ function extractEventUrls(event, reqOpts) {
 
   const urls= {
     main_page_url:event.event_url,
-    logo_url : event.logo
+    logo_url : event.logo,
+    background_url :event.background_url,
+    date : moment(event.start_time).locale('de').format('ddd D. MMM') + ' / ' + moment(event.start_time).format('ddd, Do MMM'),
+    time : moment(event.start_time).format('HH:mm'),
+    name : event.name,
+    location : event.location_name
   };
   if (reqOpts.assetmode === 'download') {
     const appFolder = reqOpts.email + '/' + slugify(reqOpts.name);
     if ((event.logo !== null) && (event.logo.substring(0, 4) === 'http')) {
      urls.logo_url = distHelper.downloadSpeakerPhoto(appFolder, event.logo);
+    }
+    if ((event.background_url !== null) && (event.background_url.substring(0, 4) === 'http')) {
+     urls.background_url = distHelper.downloadSpeakerPhoto(appFolder, event.background_url);
     }
   }
 
@@ -203,8 +215,22 @@ function getCopyrightData(event) {
 
 function foldByLevel(sponsors ,reqOpts) {
   let levelData = {};
-
+  let level1=0,level2=0,level3=0;
   const appFolder = reqOpts.email + '/' + slugify(reqOpts.name);
+  sponsors.forEach( (sponsor) => {
+    if(sponsor.level==="1" && (sponsor.logo !== null||" ")){
+      level1++;
+    }
+    if (sponsor.level==="2" && (sponsor.logo !== null||" ")) {
+       level2++;
+    }
+     if (sponsor.level==="3" && (sponsor.logo !== null||" ")) {
+       level3++;
+    }
+
+  });
+  console.log(level2);
+  console.log(level1);
   sponsors.forEach((sponsor) => {
     if (levelData[sponsor.level] === undefined) {
       levelData[sponsor.level] = [];
@@ -232,16 +258,37 @@ function foldByLevel(sponsors ,reqOpts) {
 
     switch (sponsorItem.level) {
       case '1':
+      if(level1 === 1) {
         sponsorItem.divclass = 'largeoffset col-md-4';
+      }
+      else if(level1 === 2) {
+        sponsorItem.divclass = 'sublargeoffset col-md-4';
+      }
+      else {
+        sponsorItem.divclass = 'col-md-4';
+      }
         sponsorItem.imgsize = 'large';
         break;
       case '2':
       default:
+       if( level2 > 0 && level2 < 6 ) {
         sponsorItem.divclass = 'mediumoffset col-md-2';
+      }
+      else {
+        sponsorItem.divclass = 'col-md-2';
+      }
         sponsorItem.imgsize = 'medium';
         break;
       case '3':
-        sponsorItem.divclass = 'smalloffset col-md-2';
+      if (level3 === 1) {
+         sponsorItem.divclass = 'smalloffset col-md-2';
+      }
+      else if( level3 >1 && level3 < 5){
+        sponsorItem.divclass = 'mediumoffset col-md-2';
+      }
+      else {
+         sponsorItem.divclass = 'col-md-2';
+      }
         sponsorItem.imgsize = 'small';
         break;
     }
@@ -305,15 +352,13 @@ function getAppName(event) {
     return name;
 }
 
-module.exports = {
-  foldByTrack,
-  foldByDate,
-  createSocialLinks ,
-  extractEventUrls,
-  getCopyrightData,
-  foldByLevel,
-  foldByRooms,
-  slugify,
-  getAppName
+module.exports.foldByTrack = foldByTrack;
+module.exports.foldByDate = foldByDate;
+module.exports.createSocialLinks = createSocialLinks;
+module.exports.extractEventUrls = extractEventUrls;
+module.exports.getCopyrightData = getCopyrightData;
+module.exports.foldByLevel = foldByLevel;
+module.exports.foldByRooms = foldByRooms;
+module.exports.slugify = slugify;
+module.exports.getAppName = getAppName;
 
-};
