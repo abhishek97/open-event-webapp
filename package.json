@@ -4,7 +4,7 @@
   "description": "Open Event Webapp",
   "main": "index.js",
   "scripts": {
-    "server.generator": "node src/generator/app.js",
+    "server.generator": "node src/app.js",
     "start": "npm run server.generator",
     "test": "mocha",
     "coverage": "istanbul cover _mocha"
@@ -23,6 +23,7 @@
     "adm-zip": "^0.4.7",
     "archiver": "^1.0.0",
     "async": "^2.0.0-rc.6",
+    "body-parser": "^1.15.2",
     "chai": "^3.5.0",
     "compression": "^1.6.2",
     "connect-domain": "^0.5.0",
@@ -32,9 +33,11 @@
     "handlebars": "^4.0.5",
     "jsonfile": "^2.3.1",
     "moment": "^2.13.0",
-    "multer": "^1.1.0",
     "node-sass": "^3.7.0",
-    "request": "^2.72.0"
+    "request": "^2.72.0",
+    "sendgrid": "^3.0.11",
+    "socket.io": "^1.4.8",
+    "url-join": "^1.1.0"
   },
   "devDependencies": {
     "connect-domain": "^0.5.0"
